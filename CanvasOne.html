@@ -19,7 +19,7 @@
 <script>
     window.onload = function() {
         var canvas = document.getElementById("cas");
-        var ctx = canvas.getContext("2d");
+        var c = canvas.getContext("2d");
 
         resize();
         window.onresize = resize;
@@ -49,7 +49,7 @@
             dots.push({x:x, y:y, xa:xa, ya:ya, max:1000})
         }
 
-        var RAF = ( function() {
+        var ANM = ( function() {
             return window.requestAnimationFrame || function(callback) {
                 window.setTimeout(callback, 1000 / 60);
             }
@@ -107,7 +107,7 @@
 
             });
 
-            RAF(animate);
+            ANM(animate);
         }
 
     }
