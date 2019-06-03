@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="cas"></canvas>
+</body>
+<script>
+    window.onload = function() {
+        var canvas = document.getElementById("cas");
+        var ctx = canvas.getContext("2d");
+
+        resize();
+        window.onresize = resize;
+
+        function resize() {
+            canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+        }
+
+        var mouse = { x: null, y: null, max: 5000 };
+        window.onmousemove = function(e) {
+            e = e || window.event;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        };
+        window.onmouseout = function() {
+            mouse.x = null;
+            mouse.y = null;
+        };
+
+        var dots = [];
+        for (var i = 0; i < 300; i++) {
+            var x = Math.random() * canvas.width;
+            var y = Math.random() * canvas.height;
+            var xa = Math.random() * 2 - 1;
+            var ya = Math.random() * 2 - 1;
+            dots.push({x:x, y:y, xa:xa, ya:ya, max:1000})
+        }
+
+        var RAF = ( function() {
+            return window.requestAnimationFrame || function(callback) {
+                window.setTimeout(callback, 1000 / 60);
+            }
+        } )();
+
+        window.onclick = function() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+        };
+
+        setTimeout(animate,100);
+
+            function animate() {
+
+            var mouse_dots = [mouse].concat(dots);
+
+            dots.forEach(function(dot) {
+
+                dot.x += dot.xa;
+                dot.y += dot.ya;
+
+                dot.xa *= (dot.x > canvas.width || dot.x < 0) ? -1 : 1;
+                dot.ya *= (dot.y > canvas.height || dot.x < 0) ? -1 : 1;
+
+                ctx.fillRect(dot.x,dot.y,1,1);
+
+                for (var i = 0; i < mouse_dots.length; i++) {
+                    var d2 = mouse_dots[i];
+
+                    if (dot === d2 || d2.x === null || d2.y === null) break;
+
+                    var xc = dot.x - d2.x;
+                    var yc = dot.y - d2.y;
+
+                    var dis = xc * xc + yc * yc;
+
+                    if (dis < d2.max) {
+                        if (d2 === mouse && dis > (d2.max / 2)) {
+                            dot.x -= xc * 0.03;
+                            dot.y -= yc * 0.03;
+                        }
+
+                        var color = ['aqua','white','purple'];
+                        var number = Math.random() * 4;
+                        var number1 = Math.round(number);
+                        ctx.beginPath();
+                        ctx.lineWidth = 0.18;
+                        ctx.strokeStyle = color[number1];
+                        ctx.moveTo(dot.x,dot.y);
+                        ctx.lineTo(d2.x,d2.y);
+                        ctx.stroke();
+                    }
+
+                }
+                mouse_dots.splice(mouse_dots.indexOf(dot),1);
+
+            });
+
+            RAF(animate);
+        }
+
+    }
+
+</script>
+</html>
